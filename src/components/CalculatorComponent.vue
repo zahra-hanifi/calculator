@@ -3,8 +3,8 @@ import { ref } from 'vue'
 
 const input = ref(0)
 const buttons = ref([
-  'c',
-  'bs',
+  'C',
+  'BS',
   '%',
   '/',
   '7',
@@ -48,7 +48,7 @@ function handleClick(key) {}
         }"
         @click="handleClick(button)"
       >
-        {{ button.toUpperCase() }}
+        {{ button }}
       </button>
     </div>
   </div>
