@@ -28,6 +28,7 @@ const buttons = ref([
 const operands = ref(['1', '2', '3', '4', '5', '6', '7', '8', '9', '0', '00', '.'])
 const operatorKey = ref('')
 const calculated = ref(false)
+const result = ref('')
 
 function handleClick(key) {
   switch (key) {
@@ -78,19 +79,19 @@ function addOperator(key) {
 function equal() {
   switch (operatorKey.value) {
     case '+':
-      secondValue.value = `${parseFloat(firstValue.value) + parseFloat(secondValue.value)}`
+      result.value = `${parseFloat(firstValue.value) + parseFloat(secondValue.value)}`
       calculated.value = true
       break
     case '-':
-      secondValue.value = `${parseFloat(firstValue.value) - parseFloat(secondValue.value)}`
+      result.value = `${parseFloat(firstValue.value) - parseFloat(secondValue.value)}`
       calculated.value = true
       break
     case '/':
-      secondValue.value = `${parseFloat(firstValue.value) / parseFloat(secondValue.value)}`
+      result.value = `${parseFloat(firstValue.value) / parseFloat(secondValue.value)}`
       calculated.value = true
       break
     case 'x':
-      secondValue.value = `${parseFloat(firstValue.value) * parseFloat(secondValue.value)}`
+      result.value = `${parseFloat(firstValue.value) * parseFloat(secondValue.value)}`
       calculated.value = true
       break
   }
@@ -100,10 +101,15 @@ function clear() {
   secondValue.value = ''
   firstValue.value = ''
   operatorKey.value = ''
+  result.value = ''
 }
 
 function backspace() {
-  secondValue.value = secondValue.value.slice(0, -1)
+  if (calculated.value) {
+      result.value = result.value.slice(0, -1)
+  } else {
+      secondValue.value = secondValue.value.slice(0, -1)
+  }
 }
 
 function percent() {
@@ -111,7 +117,12 @@ function percent() {
 }
 
 function setFirstOperand() {
-  if (secondValue.value) {
+  if (calculated.value) {
+      firstValue.value = result.value
+      result.value = ''
+      secondValue.value = ''
+      calculated.value = false
+  } else if (secondValue.value) {
     firstValue.value = secondValue.value
     secondValue.value = ''
   }
@@ -121,18 +132,18 @@ function setFirstOperand() {
 <template>
   <div class="p-6 sm:p-8 flex flex-col gap-y-8">
     <div class="flex flex-col gap-y-1" dir="rtl">
-      <span class="text-gray-500">
+      <span class="text-gray-500 h-6">
         {{ calculated ? secondValue : '' }} {{ operatorKey }} {{ firstValue }}
       </span>
 
-      <span class="text-4xl text-white">{{ secondValue || 0 }}</span>
+      <span class="text-4xl text-white">{{ calculated ? result || 0 : secondValue || 0 }}</span>
     </div>
 
     <div class="grid grid-cols-4 gap-6">
       <button
         v-for="button in buttons"
         :key="button"
-        class="flex justify-center items-center w-14 h-14 sm:w-20 sm:h-20 rounded-full bg-[#3a3f42] shadow-md text-lg sm:text-2xl text-red-500 font-medium"
+        class="flex justify-center items-center text-lg sm:text-2xl rounded-full bg-[#3a3f42] shadow-md aspect-square text-red-500"
         :class="{
           'bg-[#2f3336] text-white': operands.includes(button),
           'bg-red-500 !text-gray-900': button === '='
